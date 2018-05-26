@@ -1,4 +1,4 @@
-=== Self Google Fonts ===
+=== Self-Hosted Google Fonts ===
 Contributors: asadkn
 Tags: gdpr, google fonts, typography
 Requires at least: 4.0

@@ -1,10 +1,10 @@
 <?php
 /**
- * Selfhost Google Fonts
+ * Self-Hosted Google Fonts
  * 
  * @package           Sphere\SGF
  *
- * Plugin Name:       Selfhost Google Fonts
+ * Plugin Name:       Self-Hosted Google Fonts
  * Description:       Automatically self-host your Google Fonts - works with any theme or plugin.
  * Version:           1.0.0
  * Author:            asadkn
