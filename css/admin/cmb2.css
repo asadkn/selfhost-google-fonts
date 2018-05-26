@@ -1,0 +1,17 @@
+.sphere-cmb2-wrap label > .cmb2-metabox-description {
+	font-size: 13px;
+	font-style: normal;
+	color: #666;
+}
+
+.sphere-cmb2-wrap .cmb2-metabox > .cmb-row {
+	padding: 20px 1em !important;
+}
+
+.sphere-cmb2-wrap .cmb2-metabox > .cmb-row:first-child {
+	padding-top: 0 !important;
+}
+
+.cmb2-options-page .cmb2-metabox > .cmb-row > .cmb-th {
+	font-weight: 500;
+}
