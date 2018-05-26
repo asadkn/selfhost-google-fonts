@@ -105,7 +105,7 @@ class Admin
 		?>
 		</p>
 			
-		<p><a href="" class="button button-primary"><?php esc_html_e('Plugin Settings', 'sphere-sgf'); ?></a></p>
+		<p><a href="<?php echo admin_url('options-general.php?page=sgf_options'); ?>" class="button button-primary"><?php esc_html_e('Plugin Settings', 'sphere-sgf'); ?></a></p>
 		
 		</div>
 		<?php

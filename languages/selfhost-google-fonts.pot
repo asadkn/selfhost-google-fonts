@@ -17,62 +17,74 @@ msgstr ""
 msgid "The %2$sSelf-Hosted Google Fonts%3$s plugin requires %2$sPHP 5.3.2+%3$s to run properly. Please contact your web hosting company and ask them to update the PHP version of your site.%4$s Your current version of PHP: %2$s%1$s%3$s"
 msgstr ""
 
-#: inc/admin.php:68
+#: inc/admin.php:98
 msgid "Inactive: Self-Hosted Google Fonts"
 msgstr ""
 
-#: inc/admin.php:71
+#: inc/admin.php:101
 msgid "This plugin is activated but has not been enabled to process anything in settings. If you don't need to auto self-host Google Fonts, you should deactivate this plugin."
 msgstr ""
 
-#: inc/admin.php:78
+#: inc/admin.php:108
 msgid "Plugin Settings"
 msgstr ""
 
-#: inc/admin.php:103
+#: inc/admin.php:135
 msgid "Self-Hosted Google Fonts Settings"
 msgstr ""
 
-#: inc/admin.php:107
+#: inc/admin.php:139
 msgid "Self-Hosted Google Fonts"
 msgstr ""
 
-#: inc/admin.php:120
+#: inc/admin.php:152
 msgid "Enable Processing"
 msgstr ""
 
-#: inc/admin.php:121
+#: inc/admin.php:153
 msgid "Once this is enabled, fonts will be downloaded from Google Fonts server."
 msgstr ""
 
-#: inc/admin.php:125
+#: inc/admin.php:157
 msgid "Disabled"
 msgstr ""
 
-#: inc/admin.php:126
+#: inc/admin.php:158
 msgid "Yes, Enable"
 msgstr ""
 
-#: inc/admin.php:132
+#: inc/admin.php:164
+msgid "Disable for Admins"
+msgstr ""
+
+#: inc/admin.php:165
+msgid "Disable processing for logged in admin users or any user with capability \"manage_options\". (Useful if using a pagebuilder that conflicts)"
+msgstr ""
+
+#: inc/admin.php:173
 msgid "Process Enqueues"
 msgstr ""
 
-#: inc/admin.php:133
+#: inc/admin.php:174
 msgid "Process properly enqueued Google Fonts. This should be enough for most themes and plugins."
 msgstr ""
 
-#: inc/admin.php:141
+#: inc/admin.php:182
 msgid "Process CSS Files"
 msgstr ""
 
-#: inc/admin.php:142
+#: inc/admin.php:183
 msgid "Scan all local CSS files in HTML. Use if processing enqueus is not enough for your themes and plugins. Has slight performance impact - best used with cache plugins."
 msgstr ""
 
-#: inc/admin.php:150
+#: inc/admin.php:191
 msgid "Process Inline CSS"
 msgstr ""
 
-#: inc/admin.php:151
+#: inc/admin.php:192
 msgid "Scan all inline CSS. Has slight performance impact - best used with cache plugins."
+msgstr ""
+
+#: inc/admin.php:213
+msgid "Cache Status: %d Items"
 msgstr ""
