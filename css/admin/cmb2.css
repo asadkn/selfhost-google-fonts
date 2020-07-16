@@ -15,3 +15,13 @@
 .cmb2-options-page .cmb2-metabox > .cmb-row > .cmb-th {
 	font-weight: 500;
 }
+
+.sphere-cmb2-wrap .cache-info {
+	margin-top: 20px;
+}
+
+.sphere-cmb2-wrap .verify-info {
+	border-top: 1px solid #ddd;
+	margin-top: 20px;
+	padding-top: 20px;
+}

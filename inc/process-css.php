@@ -216,7 +216,7 @@ class ProcessCss {
 		// We're not working with encoded URLs
 		if (strpos($url,'%') !== false) {
             $url = urldecode($url);
-        }
+		}
 
 		// Add http:// back for parse_url() or it fails
 		$url_no_proto = preg_replace(self::PROTO_REMOVE_PATTERN, '', $url);

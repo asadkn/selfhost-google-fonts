@@ -5,7 +5,9 @@ jQuery( document ).ready( function( $ ) {
 	 * Add 'show' and 'hide' event to JQuery event detection.
 	 * @see http://viralpatel.net/blogs/jquery-trigger-custom-event-show-hide-element/
 	 */
-	$.each( ['show', 'hide'], function( i, ev ) {
+
+	// @modified
+	$('.cmb2-row').each(['show', 'hide'], function (i, ev) {
 		var el = $.fn[ev];
 		$.fn[ev] = function() {
 			this.trigger( ev );
@@ -103,6 +105,12 @@ jQuery( document ).ready( function( $ ) {
 
 						// Handle any actions necessary.
 						currentParent.toggle( shouldShow );
+
+						// @modified
+						if (currentParent.hasClass('cmb-repeat-row')) {
+							current.parents('.cmb-row').toggle(shouldShow);
+						}
+
 						if ( current.data( 'conditional-required' ) ) {
 							current.prop( 'required', shouldShow );
 						}
@@ -251,6 +259,12 @@ jQuery( document ).ready( function( $ ) {
 
 				// Hide it.
 				dependant.parents( '.cmb-row:first' ).hide();
+
+				// @modified
+				if (dependant.parents( '.cmb-row:first' ).hasClass('cmb-repeat-row')) {
+					dependant.parents('.cmb-row').hide();
+				}
+
 				if ( dependant.data( 'conditional-required' ) ) {
 					dependant.prop( 'required', false );
 				}

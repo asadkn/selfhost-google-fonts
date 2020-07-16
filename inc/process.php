@@ -14,7 +14,8 @@ namespace Sphere\SGF;
  */
 class Process
 {
-	const CSS_URLS_CACHE = 'sgf_css_urls_cache';
+	const PROCESSED_CACHE = 'sgf_processed_cache';
+	const PRELOAD_CACHE   = 'sgf_preload_cache';
 
 	/**
 	 * JSON fonts file with all the Google Fonts data
@@ -54,7 +55,7 @@ class Process
 			/**
 			 * Process HTML for inline and local stylesheets
 			 */
-			$process_html = Plugin::options()->process_css_files || Plugin::options()->process_css_inline;
+			$process_html = Plugin::options()->process_css_files || Plugin::options()->process_css_inline || Plugin::options()->process_wf_loader;
 			if (apply_filters('sgf/process_html', $process_html)) {
 
 				/**
@@ -63,26 +64,31 @@ class Process
 				 * Note: Autoptimize starts at priority 2 so we use 3 to process BEFORE AO.
 				 */
 				add_action('template_redirect', function() {	
-					ob_start(array(
-						Plugin::process_css(), 'process_markup'
-					));
-				}, 3);
+					
+					ob_start(array($this, 'process_markup'));
 
+				}, 3);
 
 				// DEBUG: Devs if your output is disappearing - which you need for debugging,
 				// uncomment below and comment the init action above.
 				// add_action('init', function() { ob_start(); }, 100);
 				// add_action('shutdown', function() {
 				// 	$content = ob_get_clean();
-				// 	echo Plugin::process_css()->process_markup($content);
+				// 	echo $this->process_markup($content);
 				// }, -10);
 			}
 
+			if (Plugin::options()->preload_fonts) {
+				add_action('wp_print_styles', array($this, 'print_preload'));
+			}
 		}
 	}
 
 	/**
 	 * Process standard WordPress enqueues
+	 * 
+	 * @param string $url
+	 * @return string
 	 */
 	public function process_enqueue($url)
 	{
@@ -93,6 +99,24 @@ class Process
 		}
 
 		return $url;
+	}
+
+	/**
+	 * Process Markup as as needed
+	 * 
+	 * @param  string $html
+	 * @return string
+	 */
+	public function process_markup($html)
+	{
+		$html = Plugin::process_css()->process_markup($html);
+
+		// Process WebFont loader
+		if (SGF_IS_PRO && Plugin::options()->process_wf_loader) {
+			$html = Plugin::process_js()->process_markup($html);
+		}
+		
+		return $html;
 	}
 
 	/**
@@ -155,27 +179,32 @@ class Process
 
 	/**
 	 * Add a url to file name to cache
+	 * 
+	 * @param string $id     A URL or other unique id
+	 * @param string $value  File or other value to store
 	 */
-	public function add_cache($url, $file)
+	public function add_cache($id, $value)
 	{
 		$cache = $this->get_cache();
-		$cache[ md5($url) ] = $file;
+		$cache[ md5($id) ] = $value;
 
-		set_transient(self::CSS_URLS_CACHE, $cache);
+		set_transient(self::PROCESSED_CACHE, $cache);
 	}
 
 	/**
 	 * Get cache for a URL or return all cache
+	 * 
+	 * @param string $id  A URL or other unique id
 	 */
-	public function get_cache($url = null)
+	public function get_cache($id = null)
 	{
-		$cache = (array) get_transient(self::CSS_URLS_CACHE);
+		$cache = (array) get_transient(self::PROCESSED_CACHE);
 
-		if ($url === null) {
+		if ($id === null) {
 			return $cache;
 		}
 
-		$cache_key = md5($url);
+		$cache_key = md5($id);
 		if (!empty($cache[$cache_key])) {
 			return $cache[$cache_key];
 		}
@@ -282,6 +311,8 @@ class Process
 	 * Parses a Google Fonts query string and returns an array
 	 * of families and subsets used.
 	 * 
+	 * NOTE: Data must NOT be urlencoded. 
+	 * 
 	 * @param string|array $query  Query string or parsed query string
 	 * 
 	 * @return array 
@@ -295,12 +326,13 @@ class Process
 			$parsed = $query;
 		}
 
-		if (empty($parsed['subset'])) {
-			$parsed['subset'] = 'latin';
-		}
-
+		$parsed   = array_map('trim', $parsed);
 		$families = explode('|', $parsed['family']);
-		$subsets  = explode(',', $parsed['subset']);
+
+		$subsets = array();
+		if (!empty($parsed['subset'])) {
+			$subsets  = explode(',', $parsed['subset']);
+		}
 
 		/**
 		 * Parse variants/weights and font names
@@ -308,9 +340,9 @@ class Process
 		foreach ($families as $k => $font) {
 
 			$font_query = explode(':', $font);
-			$font_name  = $font_query[0];
+			$font_name  = trim($font_query[0]);
 
-			if (!$font_query[1]) {
+			if (empty($font_query[1])) {
 				$variants = array(400);
 			}
 			else {
@@ -319,8 +351,31 @@ class Process
 
 			$families[$k] = array(
 				'name'      => $font_name,
-				'variants'  => $variants
+				'variants'  => array_map('strtolower', $variants)
 			);
+
+			// Third chunk - probably a subset here from WF loader
+			if (!empty($font_query[2])) {
+
+				// Split and trim
+				$font_subs = array_map('trim', explode(',', $font_query[2]));
+
+				// Add it to the subsets array
+				$subsets = array_merge($subsets, $font_subs);
+			}
+		}
+
+		// Add fored subsets
+		if (Plugin::options()->force_subsets) {
+			$subsets = array_merge($subsets, (array) Plugin::options()->force_subsets);
+		}
+
+		// Remove duplicates
+		$subsets = array_unique($subsets);
+
+		// At least one subset is required
+		if (empty($subsets)) {
+			$subsets = array('latin');
 		}
 
 		return array(
@@ -359,6 +414,66 @@ class Process
 	public function remove_fonts_prefetch($urls)
 	{
 		return array_diff($urls, array('fonts.googleapis.com'));
+	}
+
+	/**
+	 * Output the preload for fonts
+	 */
+	public function print_preload()
+	{
+		$files = $this->get_preload_fonts();
+
+		foreach ($files as $file) {
+			echo '<link rel="preload" href="' . esc_url($file) . '" as="font">';
+		}
+	}
+
+	/**
+	 * Get all the font file URLs to preload
+	 * 
+	 * @see  get_transient()
+	 * @see  set_transient()
+	 * @uses self::get_fonts_json()
+	 * 
+	 * @return array  URLs of font files
+	 */
+	public function get_preload_fonts()
+	{
+		// Check it cache first?
+		$cache = get_transient(self::PRELOAD_CACHE);
+		if ($cache) {
+			return $cache;
+		}
+
+		$fonts = (array) Plugin::options()->preload_fonts;
+		$json  = $this->get_fonts_json();
+		$files = array();
+
+		foreach ($fonts as $font) {
+			$font = explode(':', $font);
+			$name = $font[0];
+
+			// 2nd and 3rd chunks are weight and subset
+			$weight = !empty($font[1]) ? trim($font[1]) : '400';
+			$subset = !empty($font[2]) ? trim($font[2]) : 'latin';
+
+			// Unknown font/weight/subset combo?
+			if (empty($json[$name][$subset][$weight])) {
+				continue;
+			}
+
+			// The woff2 file
+			$file = $json[$name][$subset][$weight]['fontFile'];
+
+			// Get local URL from cache if it was ever processed
+			$cache = $this->get_cache($file);
+			if ($cache) {
+				$files[] = $cache;
+			}
+		}
+		
+		set_transient(self::PRELOAD_CACHE, $files);
+		return $files;
 	}
 
 	/**
@@ -411,15 +526,20 @@ class Process
 	public function get_upload_url($file = '')
 	{
 		$upload = wp_upload_dir(null, false);
-		$path   = trailingslashit($upload['baseurl']) . 'sgf-css/';
-		
-		if ($file) {
-			return $path . $file;
+		$url    = trailingslashit($upload['baseurl']) . 'sgf-css/';
+
+		// Protocol relative URLs?
+		if (Plugin::options()->protocol_relative) {
+			$url = preg_replace('#^https?://#i', '//', $url);
 		}
 
-		return $path;
-	}
+		if ($file) {
+			return $url . $file;
+		}
 
+		return $url;
+	}
+	
 	/**
 	 * Load and return the Google Fonts data
 	 */

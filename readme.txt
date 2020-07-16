@@ -1,9 +1,9 @@
 === Self-Hosted Google Fonts ===
 Contributors: asadkn
-Tags: gdpr, google fonts, typography
+Tags: gdpr, google fonts, typography, dsgvo
 Requires at least: 4.0
 Tested up to: 4.9.6
-Requires PHP: 5.3
+Requires PHP: 5.4
 Stable tag: trunk
 License: GPLv2
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -48,6 +48,12 @@ It will not work with JS solutions like WebFont Loader. If you're a developer, y
 3. Clear all caches from any cache plugin you may have active.
 
 == Changelog ==
+
+= 1.0.1 =
+* Added an option to toggle protocol-relative URLs for generated CSS files.
+* Fixed: Checkbox options not saving. 
+* Fixed: Italics not getting correct WOFF2 files.
+* Added normalization to support regular/bold as 400/700.
 
 = 1.0.0 =
 * Initial release.

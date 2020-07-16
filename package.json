@@ -14,10 +14,13 @@
 		"deploy": "npm install && composer install && gulp"
 	},
 	"devDependencies": {
+		"del": "^3.0.0",
 		"gulp": "^3.9.1",
 		"gulp-autoprefixer": "^3.1.0",
+		"gulp-debug": "^4.0.0",
 		"gulp-sass": "^2.2.0",
 		"gulp-wp-pot": "^2.3.1",
-		"pump": "^1.0.3"
+		"pump": "^1.0.3",
+		"shelljs": "^0.8.2"
 	}
 }
