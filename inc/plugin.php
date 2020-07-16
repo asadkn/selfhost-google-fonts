@@ -14,6 +14,7 @@ namespace Sphere\SGF;
  * @method static \WP_Filesystem_Base  file_system()  Via \Sphere\SGF\Filesystem
  * @method static Process    process()
  * @method static ProcessCss process_css()
+ * @method static ProcessJs  process_js()
  * @method static Options    options()
  */
 class Plugin 
@@ -21,7 +22,7 @@ class Plugin
 	/**
 	 * Plugin version
 	 */
-	const VERSION = '1.0.0';
+	const VERSION = '1.0.1';
 
 	public static $instance;
 
@@ -58,8 +59,18 @@ class Plugin
 		// Process CSS with lazy init singleton
 		$this->container['process_css'] = $this->shared('\Sphere\SGF\ProcessCss');
 
+		// Process JS - PRO only
+		$this->container['process_js']  = $this->shared('\Sphere\SGF\ProcessJs');
+
 		// Options object with bound constructor args
 		$this->container['options'] = $this->shared('\Sphere\SGF\Options', array('sgf_options'));
+
+		if (SGF_IS_PRO) {
+			
+			// Verification object
+			$this->container['verify'] = new Verify;
+			self::verify()->init();
+		}
 		
 		/**
 		 * Admin only requires
@@ -74,6 +85,11 @@ class Plugin
 
 			$admin = new Admin;
 			$admin->init();
+
+			if (SGF_IS_PRO) {
+				$admin_pro = new AdminPro;
+				$admin_pro->init();
+			}
 
 			// We don't want CMB2 backend loaded at all in AJAX requests (admin-ajax.php passes is_admin() test)
 			if (!wp_doing_ajax()) {

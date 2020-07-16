@@ -13,78 +13,158 @@ msgstr ""
 "X-Poedit-SourceCharset: UTF-8\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: selfhost-google-fonts.php:29
-msgid "The %2$sSelf-Hosted Google Fonts%3$s plugin requires %2$sPHP 5.3.2+%3$s to run properly. Please contact your web hosting company and ask them to update the PHP version of your site.%4$s Your current version of PHP: %2$s%1$s%3$s"
+#: bootstrap.php:18
+msgid "The %2$sSelf-Hosted Google Fonts%3$s plugin requires %2$sPHP 5.4+%3$s to run properly. Please contact your web hosting company and ask them to update the PHP version of your site.%4$s Your current version of PHP has reached end-of-life is %2$shighly insecure: %1$s%3$s"
 msgstr ""
 
-#: inc/admin.php:98
+#: inc/admin-pro.php:30
+msgid "Process WebFont Loader"
+msgstr ""
+
+#: inc/admin-pro.php:31
+msgid "Onle works if the JS-based WebFont Loader is used in the HTML. This will scan HTML, find and replace any instance of WebFont loader."
+msgstr ""
+
+#: inc/admin-pro.php:47
+msgid "Force Network Fonts"
+msgstr ""
+
+#: inc/admin-pro.php:48
+msgid "Ignore locally installed font and force the browser to always load the font from your site even if the font is installed on the device."
+msgstr ""
+
+#: inc/admin-pro.php:63
+msgid "Font Display Behavior"
+msgstr ""
+
+#: inc/admin-pro.php:65
+msgid "%sRead details here%s. For modern browsers, you can control how font is rendered while it loads. Swap is best if you have slow connection users. Block if you dont want to see a different font at all."
+msgstr ""
+
+#: inc/admin-pro.php:71
+msgid "Auto"
+msgstr ""
+
+#: inc/admin-pro.php:72
+msgid "Swap"
+msgstr ""
+
+#: inc/admin-pro.php:73
+msgid "Block"
+msgstr ""
+
+#: inc/admin-pro.php:74
+msgid "Fallback"
+msgstr ""
+
+#: inc/admin-pro.php:75
+msgid "Optional"
+msgstr ""
+
+#: inc/admin-pro.php:82
+msgid "Preload Fonts"
+msgstr ""
+
+#: inc/admin-pro.php:84
+msgid "Add rel=preload for a font or two. Requires two refreshes on front-end after saving. Enter the font name preload regular weight: %1$sOpen Sans%2$s, but others weights and subsets supported by using : separator. Example with weight and subset: %1$sOpen Sans:600:latin%2$s"
+msgstr ""
+
+#: inc/admin-pro.php:120
+msgid "Force Subsets"
+msgstr ""
+
+#: inc/admin-pro.php:122
+msgid "By default, language subsets as defined originally by the theme/plugins are used. This will force these subsets on all Google Fonts used (if the font supports them)."
+msgstr ""
+
+#: inc/admin.php:134
 msgid "Inactive: Self-Hosted Google Fonts"
 msgstr ""
 
-#: inc/admin.php:101
+#: inc/admin.php:137
 msgid "This plugin is activated but has not been enabled to process anything in settings. If you don't need to auto self-host Google Fonts, you should deactivate this plugin."
 msgstr ""
 
-#: inc/admin.php:108
+#: inc/admin.php:144
 msgid "Plugin Settings"
 msgstr ""
 
-#: inc/admin.php:135
+#: inc/admin.php:172
 msgid "Self-Hosted Google Fonts Settings"
 msgstr ""
 
-#: inc/admin.php:139
+#: inc/admin.php:176
 msgid "Self-Hosted Google Fonts"
 msgstr ""
 
-#: inc/admin.php:152
+#: inc/admin.php:189
 msgid "Enable Processing"
 msgstr ""
 
-#: inc/admin.php:153
-msgid "Once this is enabled, fonts will be downloaded from Google Fonts server."
+#: inc/admin.php:190
+msgid "Once this is enabled, fonts will be served from your server."
 msgstr ""
 
-#: inc/admin.php:157
+#: inc/admin.php:194
 msgid "Disabled"
 msgstr ""
 
-#: inc/admin.php:158
+#: inc/admin.php:195
 msgid "Yes, Enable"
 msgstr ""
 
-#: inc/admin.php:164
+#: inc/admin.php:203
+msgid "Verify It Works"
+msgstr ""
+
+#: inc/admin.php:204
+msgid "Automatically check if any calls are being made to Google on the front-end. Read docs for details."
+msgstr ""
+
+#: inc/admin.php:212
+msgid "Verify Now"
+msgstr ""
+
+#: inc/admin.php:220
 msgid "Disable for Admins"
 msgstr ""
 
-#: inc/admin.php:165
+#: inc/admin.php:221
 msgid "Disable processing for logged in admin users or any user with capability \"manage_options\". (Useful if using a pagebuilder that conflicts)"
 msgstr ""
 
-#: inc/admin.php:173
+#: inc/admin.php:229
 msgid "Process Enqueues"
 msgstr ""
 
-#: inc/admin.php:174
+#: inc/admin.php:230
 msgid "Process properly enqueued Google Fonts. This should be enough for most themes and plugins."
 msgstr ""
 
-#: inc/admin.php:182
+#: inc/admin.php:238
 msgid "Process CSS Files"
 msgstr ""
 
-#: inc/admin.php:183
+#: inc/admin.php:239
 msgid "Scan all local CSS files in HTML. Use if processing enqueus is not enough for your themes and plugins. Has slight performance impact - best used with cache plugins."
 msgstr ""
 
-#: inc/admin.php:191
+#: inc/admin.php:247
 msgid "Process Inline CSS"
 msgstr ""
 
-#: inc/admin.php:192
+#: inc/admin.php:248
 msgid "Scan all inline CSS. Has slight performance impact - best used with cache plugins."
 msgstr ""
 
-#: inc/admin.php:213
+#: inc/admin.php:256
+msgid "Protocol Relative URLs"
+msgstr ""
+
+#: inc/admin.php:257
+msgid "Use protocol-relative URLs for generated CSS files. This can fix issues with a partial SSL move such as CloudFlare where the backend is actually on HTTP."
+msgstr ""
+
+#: inc/admin.php:280
 msgid "Cache Status: %d Items"
 msgstr ""

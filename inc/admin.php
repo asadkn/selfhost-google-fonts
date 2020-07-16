@@ -28,7 +28,7 @@ class Admin
 			add_action('admin_notices', array($this, 'active_notice'));
 		}
 
-		// Page to download database
+		// Page to delete cache
 		add_action('admin_menu', function() {
 			add_submenu_page(
 				null, 
@@ -38,6 +38,36 @@ class Admin
 				'sgf-delete-cache', 
 				array($this, 'delete_cache')
 			);
+		});
+
+		/**
+		 * CMB2 doesn't save unchecked making default => true impossible. Let's fix it.
+		 */
+		add_filter('cmb2_sanitize_toggle', function($override, $value) {
+			return is_null($value) ? 0 : $value;
+		}, 20, 2);
+
+		// Empty cache on save
+		add_action('cmb2_save_options-page_fields', array($this, '_empty_cache'));
+
+		// Custom CMB2 field for manual callback
+		add_action('cmb2_render_manual', function($field) {
+
+			// Add attributes to an empty span for cmb2-conditional
+			if (!empty($field->args['attributes'])) {
+				printf('<meta name="%s" %s />', 
+					$field->args('id'),
+					\CMB2_Utils::concat_attrs($field->args('attributes'))
+				);
+			}
+
+			if (!empty($field->args['render_html']) && is_callable($field->args['render_html'])) {
+				call_user_func($field->args['render_html'], $field);
+			}
+
+			if (!empty($field->args['desc'])) {
+				echo '<p class="cmb2-metabox-description">' . esc_html($field->args['desc']) . '</p>';
+			}
 		});
 	}
 
@@ -71,9 +101,15 @@ class Admin
 	public function delete_cache()
 	{
 		check_admin_referer('sgf_delete_cache');
-		delete_transient(Process::CSS_URLS_CACHE);
+		$this->_empty_cache();
 
 		echo "Cache cleared.";
+	}
+
+	public function _empty_cache()
+	{
+		delete_transient(Process::PROCESSED_CACHE);
+		delete_transient(Process::PRELOAD_CACHE);
 	}
 
 	/**
@@ -121,8 +157,9 @@ $instructions = <<<EOF
 <div>
 <h4>Important Info About Self-Hosted Fonts</h4>
 <p>
-	Once Processing is enabled, the plugin will scan for Google Fonts on your site and download them to your server. These fonts are downloaded from 
-	<code>fonts.gstatic.com</code> and have <a href="https://fonts.google.com/attribution">opensource licenses</a> (SIL v1.1 or compatible).
+	Once Processing is enabled, the plugin will scan for Google Fonts on your site and download them to your server. Your visitors will then get these fonts 
+	from <strong>your server</strong>. These fonts are downloaded from <code>fonts.gstatic.com</code> and 
+	have <a href="https://fonts.google.com/attribution">opensource licenses</a> (SIL v1.1 or compatible).
 </p>
 </div>
 EOF;
@@ -150,7 +187,7 @@ $instructions .= $this->cache_info();
 
 		$options->add_field(array(
 			'name'    => esc_html__('Enable Processing', 'sphere-sgf'),
-			'desc'    => esc_html__('Once this is enabled, fonts will be downloaded from Google Fonts server.', 'sphere-sgf'),
+			'desc'    => esc_html__('Once this is enabled, fonts will be served from your server.', 'sphere-sgf'),
 			'id'      => 'enabled',
 			'type'    => 'select',
 			'options' => array(
@@ -159,6 +196,25 @@ $instructions .= $this->cache_info();
 			),
 			'default' => '',
 		));
+
+		if (SGF_IS_PRO) {
+
+			$options->add_field(array(
+				'name'     => esc_html__('Verify It Works', 'sphere-sgf'),
+				'desc'     => esc_html__('Automatically check if any calls are being made to Google on the front-end. Read docs for details.', 'sphere-sgf'),
+				'id'       => 'verify',
+				'type'     => 'manual',
+				'save_field'  => false,
+				'render_html' => function($field) {
+					printf(
+						'<a href="%s" class="button button-secondary" target=_blank>%s</a>', 
+						esc_url( add_query_arg('sgf_verify', 1, site_url()) ),
+						esc_html__('Verify Now', 'sphere-sgf')
+					);
+				},
+				'attributes' => array('data-conditional-id' => 'enabled'),
+			));
+		}
 
 		$options->add_field(array(
 			'name'    => esc_html__('Disable for Admins', 'sphere-sgf'),
@@ -196,6 +252,17 @@ $instructions .= $this->cache_info();
 			'attributes' => array('data-conditional-id' => 'enabled'),
 		));
 
+		$options->add_field(array(
+			'name'    => esc_html__('Protocol Relative URLs', 'sphere-sgf'),
+			'desc'    => esc_html__('Use protocol-relative URLs for generated CSS files. This can fix issues with a partial SSL move such as CloudFlare where the backend is actually on HTTP.', 'sphere-sgf'),
+			'id'      => 'protocol_relative',
+			'type'    => 'checkbox',
+			'default' => 1,
+			'attributes' => array('data-conditional-id' => 'enabled'),
+		));
+
+		do_action('sgf/admin/after_options', $options);
+
 	}
 
 	public function cache_info()
@@ -209,7 +276,7 @@ $instructions .= $this->cache_info();
 		ob_start();
 		?>
 
-		<p class="cache-info" style="margin-top: 20px;">
+		<p class="cache-info">
 			<?php printf(esc_html__('Cache Status: %d Items', 'sphere-sgf'), count($cache)); ?>
 			<a href="<?php echo wp_nonce_url(admin_url('admin.php?page=sgf-delete-cache'), 'sgf_delete_cache'); ?>" 
 				class="button button-secondary" style="margin-left: 10px;">
@@ -221,5 +288,4 @@ $instructions .= $this->cache_info();
 
 		return ob_get_clean();
 	}
-
 }

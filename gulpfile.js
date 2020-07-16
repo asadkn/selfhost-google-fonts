@@ -4,6 +4,8 @@ const autoprefixer = require('gulp-autoprefixer');
 const pump = require('pump');
 const wpPot = require('gulp-wp-pot');
 
+require('./gulp-pro');
+
 gulp.task('styles', function() {
     // pump([
 	// 	gulp.src(['scss/main.scss', 'scss/admin.scss']),
@@ -30,3 +32,4 @@ gulp.task('translate', () => {
 });
 
 gulp.task('build', ['styles', 'translate']);
+

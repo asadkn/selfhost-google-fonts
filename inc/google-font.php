@@ -37,10 +37,11 @@ class GoogleFont
 				
 				$italic = false;
 
-				// Remove italics in variant
+				// Normalize variant identifier
+				$variant = $this->_normalize_variant_id($variant);
+
 				if (strpos($variant, 'i') !== false) {
 					$italic  = true;
-					$variant = (int) str_replace(array('i', 'italic', 'italics'), '', $variant);
 				}
 
 				// Variant doesn't exist?
@@ -69,8 +70,17 @@ class GoogleFont
 				 * Build src array with localNames first and woff/woff2 next
 				 */
 				$src = array();
-				foreach ((array) $data['localNames'] as $local) {
-					$src[] = "local('{$local}')";
+
+				// Add local names unless disabled.
+				if (!Plugin::options()->disable_local_names) {
+					foreach ((array) $data['localNames'] as $local) {
+						$src[] = "local('{$local}')";
+					}
+				}
+
+				// Have a font-display setting?
+				if (Plugin::options()->font_display) {
+					$rules[] = 'font-display: ' . sanitize_text_field(Plugin::options()->font_display);
 				}
 
 				$src[] = 'url(' . esc_url_raw($data['fontFile']) . ") format('woff2')";
@@ -94,6 +104,41 @@ class GoogleFont
 		}
 
 		return $css;
+	}
+
+	/**
+	 * Normalize variant identifier
+	 */
+	public function _normalize_variant_id($variant)
+	{
+		$variant = trim($variant);
+
+		// Google API supports bold and b as variants too
+		if (stripos($variant, 'b') !== false) {
+			$variant = str_replace(array('bold', 'b'), '700', $variant);
+		}
+
+		// Normalize regular
+		$variant = str_replace('regular', '400', $variant);
+
+		// Remove italics in variant
+		if (strpos($variant, 'i') !== false) {
+
+			// Normalize italic variant
+			$variant = preg_replace('/(italics|i)$/i', 'italic', $variant);
+
+			// Italic alone isn't recognized
+			if ($variant == 'italic') {
+				$variant = '400italic';
+			}
+		}
+
+		// Fallback to 400
+		if (!$variant || (!strstr($variant, 'italic') && !is_numeric($variant))) {
+			$variant = '400';
+		}
+
+		return $variant;
 	}
 
 	/**
@@ -129,7 +174,10 @@ class GoogleFont
 			);
 		}
 
-		return Plugin::process()->get_upload_url() . $name;
+		$local_url = Plugin::process()->get_upload_url() . $name;
+		Plugin::process()->add_cache($url, $local_url);
+
+		return $local_url;
 	}
 
 	/**
