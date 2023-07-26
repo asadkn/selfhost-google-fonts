@@ -31,7 +31,7 @@ class Admin
 		// Page to download database
 		add_action('admin_menu', function() {
 			add_submenu_page(
-				null, 
+				"", 
 				'Delete Cache', 
 				'Delete Cache', 
 				'manage_options', 
