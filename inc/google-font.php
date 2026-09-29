@@ -115,7 +115,7 @@ class GoogleFont
 
 		if (!file_exists($file)) {
 
-			$request = wp_remote_get($url, array('sslverify' => false));
+			$request = wp_remote_get($url);
 			if (is_wp_error($request)) {
 				return false;
 			}
