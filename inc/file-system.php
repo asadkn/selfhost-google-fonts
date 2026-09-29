@@ -38,7 +38,7 @@ class FileSystem {
 			}
 
 			if (!$creds) {
-				$creds = arrays();
+				$creds = array();
 			}
 
 			$filesystem = WP_Filesystem($creds);

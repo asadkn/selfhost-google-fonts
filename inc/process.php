@@ -299,7 +299,7 @@ class Process
 			$parsed['subset'] = 'latin';
 		}
 
-		$families = explode('|', $parsed['family']);
+		$families = explode('|', $parsed['family'] ?? '');
 		$subsets  = explode(',', $parsed['subset']);
 
 		/**
